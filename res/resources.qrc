@@ -1,0 +1,77 @@
+<RCC>
+  <qresource prefix="/">
+    <file>themes/py_dracula_dark.qss</file>
+    <file>themes/py_dracula_light.qss</file>
+    <file>themes/app_patch.qss</file>
+
+    <!-- Images from Modern_GUI_PyDracula_PySide6_or_PyQt6-master/images/images/ -->
+    <file>images/images/PyDracula.png</file>
+
+    <!-- Icons from Modern_GUI_PyDracula_PySide6_or_PyQt6-master/images/icons/ -->
+    <file>images/icons/cil-3d.png</file>
+    <file>images/icons/cil-4k.png</file>
+    <file>images/icons/cil-account-logout.png</file>
+    <file>images/icons/cil-action-redo.png</file>
+    <file>images/icons/cil-action-undo.png</file>
+    <file>images/icons/cil-airplane-mode-off.png</file>
+    <file>images/icons/cil-airplane-mode.png</file>
+    <file>images/icons/cil-alarm.png</file>
+    <file>images/icons/cil-align-center.png</file>
+    <file>images/icons/cil-align-left.png</file>
+    <file>images/icons/cil-align-right.png</file>
+    <file>images/icons/cil-arrow-bottom-2.png</file>
+    <file>images/icons/cil-arrow-bottom.png</file>
+    <file>images/icons/cil-arrow-circle-bottom.png</file>
+    <file>images/icons/cil-arrow-circle-left.png</file>
+    <file>images/icons/cil-arrow-circle-right.png</file>
+    <file>images/icons/cil-arrow-circle-top.png</file>
+    <file>images/icons/cil-arrow-left.png</file>
+    <file>images/icons/cil-arrow-right.png</file>
+    <file>images/icons/cil-arrow-top.png</file>
+    <file>images/icons/cil-at.png</file>
+    <file>images/icons/cil-av-timer.png</file>
+    <file>images/icons/cil-ban.png</file>
+    <file>images/icons/cil-battery-0.png</file>
+    <file>images/icons/cil-battery-3.png</file>
+    <file>images/icons/cil-battery-5.png</file>
+    <file>images/icons/cil-battery-alert.png</file>
+    <file>images/icons/cil-battery-slash.png</file>
+    <file>images/icons/cil-bell.png</file>
+    <file>images/icons/cil-bluetooth.png</file>
+    <file>images/icons/cil-briefcase.png</file>
+    <file>images/icons/cil-browser.png</file>
+    <file>images/icons/cil-calendar-check.png</file>
+    <file>images/icons/cil-camera-roll.png</file>
+    <file>images/icons/cil-camera.png</file>
+    <file>images/icons/cil-caret-bottom.png</file>
+    <file>images/icons/cil-caret-left.png</file>
+    <file>images/icons/cil-caret-right.png</file>
+    <file>images/icons/cil-caret-top.png</file>
+    <file>images/icons/cil-cart.png</file>
+    <file>images/icons/cil-cast.png</file>
+    <file>images/icons/cil-chart-line.png</file>
+    <file>images/icons/cil-chart-pie.png</file>
+    <file>images/icons/cil-chart.png</file>
+    <file>images/icons/cil-chat-bubble.png</file>
+    <file>images/icons/cil-check-alt.png</file>
+    <file>images/icons/cil-check-circle.png</file>
+    <file>images/icons/cil-check.png</file>
+    <file>images/icons/cil-chevron-bottom.png</file>
+    <file>images/icons/cil-chevron-circle-down-alt.png</file>
+    <file>images/icons/cil-chevron-circle-left-alt.png</file>
+    <file>images/icons/cil-chevron-circle-right-alt.png</file>
+    <file>images/icons/cil-chevron-circle-up-alt.png</file>
+    <file>images/icons/cil-chevron-double-down.png</file>
+    <file>images/icons/cil-chevron-double-left.png</file>
+    <file>images/icons/cil-chevron-double-right.png</file>
+    <file>images/icons/cil-chevron-double-up-alt.png</file>
+    <file>images/icons/cil-chevron-double-up.png</file>
+    <file>images/icons/cil-chevron-left.png</file>
+    <file>images/icons/cil-chevron-right.png</file>
+    <file>images/icons/cil-chevron-top.png</file>
+    <file>images/icons/cil-circle.png</file>
+    <file>images/icons/cil-clipboard.png</file>
+    <file>images/icons/cil-clock.png</file>
+    <file>images/icons/icon_settings.png</file>
+  </qresource>
+</RCC>
