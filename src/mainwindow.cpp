@@ -299,24 +299,29 @@ void MainWindow::doTranslate(QPixmap snippet) {
         return;
     }
     statusLabel->setText("Translating...");
+
+    QString promptText = settingsDialog->prompt();
     QList<QJsonObject> historyToSend;
     if (settingsDialog->isHistoryEnabled()) {
         historyToSend = conversationHistory;
+        promptText = "如果除图片外额外提供了历史的翻译记录，则请参考这些历史记录优化你的翻译结果。\n" + promptText;
     }
+
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     buffer.open(QIODevice::WriteOnly);
     snippet.save(&buffer, "PNG");
     QString base64Image = byteArray.toBase64();
     QJsonObject userTextPart, userImagePart, inlineData;
-    userTextPart["text"] = settingsDialog->prompt();
+    userTextPart["text"] = settingsDialog->prompt(); // For lastRequest_userPart
     inlineData["mime_type"] = "image/png";
     inlineData["data"] = base64Image;
     QJsonArray currentUserParts; currentUserParts.append(userTextPart); currentUserParts.append(userImagePart);
     lastRequest_userPart = QJsonObject();
     lastRequest_userPart["role"] = "user";
     lastRequest_userPart["parts"] = currentUserParts;
-    apiHandler->translateImage(snippet, settingsDialog->apiKey(), settingsDialog->prompt(), settingsDialog->modelName(), historyToSend);
+
+    apiHandler->translateImage(snippet, settingsDialog->apiKey(), promptText, settingsDialog->modelName(), historyToSend);
 }
 
 void MainWindow::updateHistory(const QString& resultText) {

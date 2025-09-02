@@ -145,7 +145,7 @@ void SettingsDialog::loadSettings()
     setApiKey(settings.value("apiKey").toString());
     setModelName(settings.value("modelName", "gemini-1.5-pro").toString());
     setThemeName(settings.value("theme", "Dark").toString());
-    setPrompt(settings.value("prompt").toString());
+    setPrompt(settings.value("prompt", "请识别图片中的文字。将识别出的原文放在第一行，将对应的翻译结果放在第二行返回。两行之间不要有任何其他内容。").toString());
     setProxyEnabled(settings.value("proxy/enabled", false).toBool());
     setProxyHost(settings.value("proxy/host").toString());
     setProxyPort(settings.value("proxy/port").toInt());
