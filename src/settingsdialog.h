@@ -2,9 +2,11 @@
 #define SETTINGSDIALOG_H
 
 #include "framelessdialog.h"
+#include <QStringList>
 
 // Forward declarations
 class QLineEdit;
+class QPlainTextEdit;
 class QComboBox;
 class QCheckBox;
 class QSpinBox;
@@ -18,7 +20,7 @@ public:
     explicit SettingsDialog(QWidget *parent = nullptr);
 
     // Getters
-    QString apiKey() const;
+    QStringList apiKeys() const;
     QString modelName() const;
     QString prompt() const;
     QString themeName() const;
@@ -29,7 +31,7 @@ public:
     int historyLength() const;
 
     // Setters
-    void setApiKey(const QString &key);
+    void setApiKeys(const QStringList &keys);
     void setModelName(const QString &model);
     void setPrompt(const QString &prompt);
     void setThemeName(const QString &theme);
@@ -47,7 +49,7 @@ private:
     void saveSettings();
 
 private:
-    QLineEdit *apiKeyEdit;
+    QPlainTextEdit *apiKeyEdit;
     QComboBox *modelComboBox;
     QLineEdit *promptEdit;
     QComboBox *themeComboBox;

@@ -202,7 +202,7 @@ void MainWindow::applySettings()
     apiHandler->setProxy(settingsDialog->isProxyEnabled(), settingsDialog->proxyHost(), settingsDialog->proxyPort());
     applyTheme();
     // You can add other settings to be applied here, for example:
-    // apiHandler->setApiKey(settingsDialog->apiKey());
+    // API key handling is performed directly via SettingsDialog
     // apiHandler->setModel(settingsDialog->modelName());
 }
 
@@ -250,7 +250,7 @@ QMessageBox* MainWindow::createStyledMessageBox(QMessageBox::Icon icon, const QS
 }
 
 void MainWindow::startSnippet(CaptureMode mode) {
-    if (settingsDialog->apiKey().isEmpty()) {
+    if (settingsDialog->apiKeys().isEmpty()) {
         createStyledMessageBox(QMessageBox::Warning, "API Key Missing", "Please set your API Key in Settings.")->exec();
         return;
     }
@@ -294,7 +294,7 @@ void MainWindow::onTranslateFixedRegionClicked() {
 }
 
 void MainWindow::doTranslate(QPixmap snippet) {
-    if (settingsDialog->apiKey().isEmpty()) {
+    if (settingsDialog->apiKeys().isEmpty()) {
         createStyledMessageBox(QMessageBox::Warning, "API Key Missing", "Please set your API Key in Settings.")->exec();
         return;
     }
@@ -321,7 +321,7 @@ void MainWindow::doTranslate(QPixmap snippet) {
     lastRequest_userPart["role"] = "user";
     lastRequest_userPart["parts"] = currentUserParts;
 
-    apiHandler->translateImage(snippet, settingsDialog->apiKey(), promptText, settingsDialog->modelName(), historyToSend);
+    apiHandler->translateImage(snippet, settingsDialog->apiKeys(), promptText, settingsDialog->modelName(), historyToSend);
 }
 
 void MainWindow::updateHistory(const QString& resultText) {
@@ -368,14 +368,14 @@ void MainWindow::onTranslationError(const QString& errorString) {
 }
 
 void MainWindow::handleApiTestRequest() {
-    QString apiKey = settingsDialog->apiKey();
-    if (apiKey.isEmpty()) {
+    QStringList keys = settingsDialog->apiKeys();
+    if (keys.isEmpty()) {
         createStyledMessageBox(QMessageBox::Warning, "API Key Missing", "Please enter your API Key in Settings before testing.")->exec();
         return;
     }
     statusLabel->setText("Testing API connection...");
     apiHandler->setProxy(settingsDialog->isProxyEnabled(), settingsDialog->proxyHost(), settingsDialog->proxyPort());
-    apiHandler->testApiConnection(apiKey);
+    apiHandler->testApiConnection(keys.first());
 }
 
 void MainWindow::handleApiTestSuccess(const QString& message) {

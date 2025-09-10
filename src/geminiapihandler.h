@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QPixmap>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -14,7 +15,7 @@ class GeminiApiHandler : public QObject
 
 public:
     explicit GeminiApiHandler(QObject *parent = nullptr);
-    void translateImage(const QPixmap &image, const QString &apiKey, const QString &prompt, const QString &modelName, const QList<QJsonObject> &history);
+    void translateImage(const QPixmap &image, const QStringList &apiKeys, const QString &prompt, const QString &modelName, const QList<QJsonObject> &history);
     void testApiConnection(const QString &apiKey);
     void setProxy(bool enabled, const QString &hostName = "127.0.0.1", quint16 port = 10808);
 
