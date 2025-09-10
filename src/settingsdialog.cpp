@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
+#include <QPlainTextEdit>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QSpinBox>
@@ -24,6 +25,7 @@
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QRegularExpression>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : FramelessDialog(parent)                 // 构造基类
@@ -32,8 +34,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     setModal(true);                           // 如需模式对话框
 
     // --- Widgets ---
-    apiKeyEdit = new QLineEdit();
-    apiKeyEdit->setEchoMode(QLineEdit::Password);
+    apiKeyEdit = new QPlainTextEdit();
+    apiKeyEdit->setPlaceholderText("One API key per line");
 
     modelComboBox = new QComboBox();
     modelComboBox->addItem("gemini-2.5-pro");
@@ -142,7 +144,7 @@ void SettingsDialog::loadSettings()
 {
     QSettings settings("ScreenTranslate", "ScreenTranslate"); // 建议使用公司和产品名
 
-    setApiKey(settings.value("apiKey").toString());
+    setApiKeys(settings.value("apiKey").toString().split('\n', Qt::SkipEmptyParts));
     setModelName(settings.value("modelName", "gemini-1.5-pro").toString());
     setThemeName(settings.value("theme", "Dark").toString());
     setPrompt(settings.value("prompt", "请识别图片中的文字。将识别出的原文放在第一行，将对应的翻译结果放在第二行返回。两行之间不要有任何其他内容。").toString());
@@ -157,7 +159,7 @@ void SettingsDialog::saveSettings()
 {
     QSettings settings("ScreenTranslate", "ScreenTranslate");
 
-    settings.setValue("apiKey", apiKey());
+    settings.setValue("apiKey", apiKeys().join('\n'));
     settings.setValue("modelName", modelName());
     settings.setValue("theme", themeName());
     settings.setValue("prompt", prompt());
@@ -169,7 +171,9 @@ void SettingsDialog::saveSettings()
 }
 
 // --- Getters ---
-QString SettingsDialog::apiKey() const { return apiKeyEdit->text().trimmed(); }
+QStringList SettingsDialog::apiKeys() const {
+    return apiKeyEdit->toPlainText().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+}
 QString SettingsDialog::modelName() const { return modelComboBox->currentText(); }
 QString SettingsDialog::prompt() const { return promptEdit->text().trimmed(); }
 QString SettingsDialog::themeName() const { return themeComboBox->currentText(); }
@@ -180,7 +184,7 @@ bool SettingsDialog::isHistoryEnabled() const { return historyCheckBox->isChecke
 int SettingsDialog::historyLength() const { return historySpinBox->value(); }
 
 // --- Setters ---
-void SettingsDialog::setApiKey(const QString &key) { apiKeyEdit->setText(key); }
+void SettingsDialog::setApiKeys(const QStringList &keys) { apiKeyEdit->setPlainText(keys.join('\n')); }
 void SettingsDialog::setModelName(const QString &model) { modelComboBox->setCurrentText(model); }
 void SettingsDialog::setPrompt(const QString &prompt) { promptEdit->setText(prompt); }
 void SettingsDialog::setThemeName(const QString &theme) { themeComboBox->setCurrentText(theme); }
