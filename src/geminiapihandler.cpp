@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QUrlQuery>
+#include <functional>
 
 GeminiApiHandler::GeminiApiHandler(QObject *parent) : QObject(parent)
 {
@@ -54,7 +55,7 @@ void GeminiApiHandler::testApiConnection(const QString &apiKey)
     });
 }
 
-void GeminiApiHandler::translateImage(const QPixmap &image, const QString &apiKey, const QString &prompt, const QString &modelName, const QList<QJsonObject> &history)
+void GeminiApiHandler::translateImage(const QPixmap &image, const QStringList &apiKeys, const QString &prompt, const QString &modelName, const QList<QJsonObject> &history)
 {
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
@@ -86,46 +87,64 @@ void GeminiApiHandler::translateImage(const QPixmap &image, const QString &apiKe
     QByteArray jsonData = jsonDoc.toJson();
 
     QString urlString = QString("https://generativelanguage.googleapis.com/v1beta/models/%1:generateContent").arg(modelName);
-    QUrl url(urlString);
-    QUrlQuery query;
-    query.addQueryItem("key", apiKey);
-    url.setQuery(query);
 
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    auto lastError = std::make_shared<QString>();
+    auto sendRequest = std::make_shared<std::function<void(int)>>();
 
-    QNetworkReply *reply = networkManager->post(request, jsonData);
-
-    connect(reply, &QNetworkReply::finished, this, [this, reply, currentUserContent]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray responseData = reply->readAll();
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-            QJsonObject jsonObj = jsonDoc.object();
-
-            if (jsonObj.contains("candidates")) {
-                QJsonArray candidates = jsonObj["candidates"].toArray();
-                if (!candidates.isEmpty()) {
-                    QJsonObject firstCandidate = candidates[0].toObject();
-                    QJsonObject content = firstCandidate["content"].toObject();
-                    QJsonArray parts = content["parts"].toArray();
-                    if (!parts.isEmpty()) {
-                        QString translatedText = parts[0].toObject()["text"].toString();
-                        // Pass back the original request and the response for history
-                        emit translationReady(translatedText);
-                    } else {
-                         emit errorOccurred("API response format error: 'parts' array is empty.");
-                    }
-                }
-            } else if (jsonObj.contains("error")) {
-                QString errorMsg = jsonObj["error"].toObject()["message"].toString();
-                emit errorOccurred("API Error: " + errorMsg);
-            } else {
-                emit errorOccurred("API response format error: 'candidates' not found.");
-            }
-        } else {
-            reply->readAll(); // Clear buffer on error
-            emit errorOccurred("Network Error: " + reply->errorString());
+    *sendRequest = [=, this, sendRequest, lastError](int index) {
+        if (index >= apiKeys.size()) {
+            emit errorOccurred(QStringLiteral("All API keys failed. Last error: %1").arg(*lastError));
+            return;
         }
-        reply->deleteLater();
-    });
+
+        QUrl url(urlString);
+        QUrlQuery query;
+        query.addQueryItem("key", apiKeys.at(index));
+        url.setQuery(query);
+
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        QNetworkReply *reply = networkManager->post(request, jsonData);
+
+        connect(reply, &QNetworkReply::finished, this, [=, this, sendRequest, lastError, index]() {
+            if (reply->error() == QNetworkReply::NoError) {
+                QByteArray responseData = reply->readAll();
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+                QJsonObject jsonObj = jsonDoc.object();
+
+                if (jsonObj.contains("candidates")) {
+                    QJsonArray candidates = jsonObj["candidates"].toArray();
+                    if (!candidates.isEmpty()) {
+                        QJsonObject firstCandidate = candidates[0].toObject();
+                        QJsonObject content = firstCandidate["content"].toObject();
+                        QJsonArray parts = content["parts"].toArray();
+                        if (!parts.isEmpty()) {
+                            QString translatedText = parts[0].toObject()["text"].toString();
+                            emit translationReady(translatedText);
+                        } else {
+                            *lastError = QStringLiteral("API response format error: 'parts' array is empty.");
+                            (*sendRequest)(index + 1);
+                        }
+                    } else {
+                        *lastError = QStringLiteral("API response format error: 'candidates' array is empty.");
+                        (*sendRequest)(index + 1);
+                    }
+                } else if (jsonObj.contains("error")) {
+                    *lastError = jsonObj["error"].toObject()["message"].toString();
+                    (*sendRequest)(index + 1);
+                } else {
+                    *lastError = QStringLiteral("API response format error: 'candidates' not found.");
+                    (*sendRequest)(index + 1);
+                }
+            } else {
+                reply->readAll();
+                *lastError = reply->errorString();
+                (*sendRequest)(index + 1);
+            }
+            reply->deleteLater();
+        });
+    };
+
+    (*sendRequest)(0);
 }
