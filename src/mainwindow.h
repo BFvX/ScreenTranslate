@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QRect>
+#include <QStringList>
 
 // Forward declarations
 class QPushButton;
@@ -50,6 +51,7 @@ private slots:
     void handleApiTestRequest();
     void handleApiTestSuccess(const QString& message);
     void handleApiTestFailed(const QString& error);
+    void handleAvailableModels(const QStringList &models);
 
 private:
     void setupUI();
