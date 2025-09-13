@@ -247,6 +247,7 @@ QMessageBox* MainWindow::createStyledMessageBox(QMessageBox::Icon icon, const QS
     msgBox->setWindowTitle(title);
     msgBox->setText(text);
     msgBox->setStyleSheet(qApp->styleSheet());
+    msgBox->setPalette(qApp->palette());
     return msgBox;
 }
 
