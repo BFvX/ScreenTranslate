@@ -107,7 +107,7 @@ void GeminiApiHandler::translateImage(const QPixmap &image, const QStringList &a
     auto lastError = std::make_shared<QString>();
     auto sendRequest = std::make_shared<std::function<void(int)>>();
 
-    *sendRequest = [=, this, sendRequest, lastError](int index) {
+    *sendRequest = [this, sendRequest, lastError, apiKeys, urlString, jsonData](int index) {
         if (index >= apiKeys.size()) {
             emit errorOccurred(QStringLiteral("All API keys failed. Last error: %1").arg(*lastError));
             return;
@@ -123,7 +123,7 @@ void GeminiApiHandler::translateImage(const QPixmap &image, const QStringList &a
 
         QNetworkReply *reply = networkManager->post(request, jsonData);
 
-        connect(reply, &QNetworkReply::finished, this, [=, this, sendRequest, lastError, index]() {
+        connect(reply, &QNetworkReply::finished, this, [this, sendRequest, lastError, reply, index]() {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray responseData = reply->readAll();
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
