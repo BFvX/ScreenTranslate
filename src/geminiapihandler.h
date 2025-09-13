@@ -24,6 +24,7 @@ signals:
     void errorOccurred(const QString &errorString);
     void apiTestSuccess(const QString &message);
     void apiTestFailed(const QString &errorString);
+    void modelsFetched(const QStringList &models);
 
 private:
     QNetworkAccessManager *networkManager;

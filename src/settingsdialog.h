@@ -40,6 +40,7 @@ public:
     void setProxyPort(quint16 port);
     void setHistoryEnabled(bool enabled);
     void setHistoryLength(int length);
+    void setAvailableModels(const QStringList &models);
 
 signals:
     void apiTestRequested();

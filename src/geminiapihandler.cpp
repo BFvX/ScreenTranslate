@@ -40,16 +40,32 @@ void GeminiApiHandler::testApiConnection(const QString &apiKey)
             QByteArray responseData = reply->readAll();
             QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
             if (jsonDoc.object().contains("models")) {
-                emit apiTestSuccess("Successfully fetched model list.");
+                QJsonArray modelsArray = jsonDoc.object()["models"].toArray();
+                QStringList modelNames;
+                for (const QJsonValue &val : modelsArray) {
+                    QString name = val.toObject()["name"].toString();
+                    if (name.startsWith("models/"))
+                        name = name.section('/', 1);
+                    modelNames.append(name);
+                }
+                emit modelsFetched(modelNames);
+                emit apiTestSuccess(QString("Fetched %1 models.").arg(modelNames.size()));
             } else if (jsonDoc.object().contains("error")) {
-                QString errorMsg = jsonDoc.object()["error"].toObject()["message"].toString();
-                emit apiTestFailed("API Error: " + errorMsg);
+                QJsonObject errorObj = jsonDoc.object()["error"].toObject();
+                int code = errorObj["code"].toInt();
+                QString errorMsg = errorObj["message"].toString();
+                emit apiTestFailed(QString("API Error (%1): %2").arg(code).arg(errorMsg));
             } else {
                 emit apiTestFailed("Unknown API response format.");
             }
         } else {
-            reply->readAll(); // Clear buffer on error
-            emit apiTestFailed("Network Error: " + reply->errorString());
+            int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            QByteArray data = reply->readAll();
+            QString err = QString("Network Error (%1): %2").arg(statusCode).arg(reply->errorString());
+            if (!data.isEmpty()) {
+                err += "\nResponse: " + QString::fromUtf8(data);
+            }
+            emit apiTestFailed(err);
         }
         reply->deleteLater();
     });
@@ -131,15 +147,23 @@ void GeminiApiHandler::translateImage(const QPixmap &image, const QStringList &a
                         (*sendRequest)(index + 1);
                     }
                 } else if (jsonObj.contains("error")) {
-                    *lastError = jsonObj["error"].toObject()["message"].toString();
+                    QJsonObject errorObj = jsonObj["error"].toObject();
+                    int code = errorObj["code"].toInt();
+                    QString message = errorObj["message"].toString();
+                    *lastError = QString("API Error (%1): %2").arg(code).arg(message);
                     (*sendRequest)(index + 1);
                 } else {
                     *lastError = QStringLiteral("API response format error: 'candidates' not found.");
                     (*sendRequest)(index + 1);
                 }
             } else {
-                reply->readAll();
-                *lastError = reply->errorString();
+                int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+                QByteArray data = reply->readAll();
+                QString err = QString("Network Error (%1): %2").arg(statusCode).arg(reply->errorString());
+                if (!data.isEmpty()) {
+                    err += "\nResponse: " + QString::fromUtf8(data);
+                }
+                *lastError = err;
                 (*sendRequest)(index + 1);
             }
             reply->deleteLater();
