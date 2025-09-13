@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(settingsDialog, &SettingsDialog::apiTestRequested, this, &MainWindow::handleApiTestRequest);
     connect(apiHandler, &GeminiApiHandler::apiTestSuccess, this, &MainWindow::handleApiTestSuccess);
     connect(apiHandler, &GeminiApiHandler::apiTestFailed, this, &MainWindow::handleApiTestFailed);
+    connect(apiHandler, &GeminiApiHandler::modelsFetched, this, &MainWindow::handleAvailableModels);
 
     loadSettings();
 }
@@ -246,6 +247,7 @@ QMessageBox* MainWindow::createStyledMessageBox(QMessageBox::Icon icon, const QS
     msgBox->setWindowTitle(title);
     msgBox->setText(text);
     msgBox->setStyleSheet(qApp->styleSheet());
+    msgBox->setPalette(qApp->palette());
     return msgBox;
 }
 
@@ -386,4 +388,11 @@ void MainWindow::handleApiTestSuccess(const QString& message) {
 void MainWindow::handleApiTestFailed(const QString& error) {
     statusLabel->setText("API test failed.");
     createStyledMessageBox(QMessageBox::Warning, "API Test Failed", "Could not connect to the Gemini API.\n\nDetails: " + error)->exec();
+}
+
+void MainWindow::handleAvailableModels(const QStringList &models) {
+    if (settingsDialog) {
+        settingsDialog->setAvailableModels(models);
+    }
+    createStyledMessageBox(QMessageBox::Information, "Available Models", models.join("\n"))->exec();
 }

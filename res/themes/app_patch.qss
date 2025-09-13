@@ -37,6 +37,22 @@ QPushButton#TitleButton:pressed {
 /* —— 中央区域（你内容所在）可不写，继承主题 —— */
 QWidget#DialogCentral { background: transparent; }
 
+/* ---- 通用对话框 / 消息框基础色 ---- */
+QDialog, QMessageBox {
+    background-color: #1e1f29;
+    color: #f0f0f0;
+}
+QMessageBox QLabel { color: #d7d9e0; }
+QMessageBox QPushButton {
+    background-color: #2a2c39;
+    color: #e6e9ef;
+    border: 1px solid #3e4255;
+    padding: 6px 14px;
+    border-radius: 6px;
+}
+QMessageBox QPushButton:hover  { background-color: #34374a; }
+QMessageBox QPushButton:pressed{ background-color: #3a3d4d; }
+
 /* ---- Settings Dialog 基础色 ---- */
 QDialog#SettingsDialog {
     background-color: #1e1f29;
